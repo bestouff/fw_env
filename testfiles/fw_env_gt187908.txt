@@ -1,0 +1,160 @@
+arch=arm
+args_mmc=run finduuid;setenv bootargs console=${console} ${cape_disable} ${cape_enable} ${cape_uboot} root=PARTUUID=${uuid} ro rootfstype=${mmcrootfstype} ${uboot_detected_capes} ${cmdline}
+args_mmc_old=setenv bootargs console=${console} ${optargs} ${cape_disable} ${cape_enable} ${cape_uboot} root=${oldroot} ro rootfstype=${mmcrootfstype} ${uboot_detected_capes} ${cmdline}
+args_mmc_uuid=setenv bootargs console=${console} ${optargs} ${cape_disable} ${cape_enable} ${cape_uboot} root=UUID=${uuid} ro rootfstype=${mmcrootfstype} ${uboot_detected_capes} ${cmdline}
+args_netinstall=setenv bootargs ${netinstall_bootargs} ${optargs} ${cape_disable} ${cape_enable} ${cape_uboot} root=/dev/ram rw ${uboot_detected_capes} ${cmdline}
+args_uenv_root=setenv bootargs console=${console} ${optargs} ${cape_disable} ${cape_enable} ${cape_uboot} root=${uenv_root} ro rootfstype=${mmcrootfstype} ${uboot_detected_capes} ${cmdline}
+baudrate=115200
+board=gorgy_carte_116
+board_eeprom_header=undefined
+board_name=gorgy_carte_116
+board_rev=¹lÜ£G%	|ìãË7Xo•~àAÌeÚ%iÄ$â‹ç’KÀB›Ä‘. Ë¸ƒÖ9q5€óèÔ¾·5¡›@e.èa>RÜiDJp!Êhå¸,#À2„š¡g©ØŸÇE›^Råá¯÷›š ƒ<ÌG ]şÓ».à¶Ş$™Ç`ò›O"İÈœD(Æ(Ûş<Ä<v%9Ö5H€ LÙÎÊ®ˆ>Ô«ÿÙ
+SÕŞœâŒÿJF©Ã¯Å2²°éB0iŞe¥‹:ğL·pQÊşªûàµLì½´×“qãü?É' $ß¹ãÌ‘*Ù²ü¹CGV@P6/–à“Nˆ°å­³£m
+board_serial=%	|ìãË7Xo•~àAÌeÚ%iÄ$â‹ç’KÀB›Ä‘. Ë¸ƒÖ9q5€óèÔ¾·5¡›@e.èa>RÜiDJp!Êhå¸,#À2„š¡g©ØŸÇE›^Råá¯÷›š ƒ<ÌG ]şÓ».à¶Ş$™Ç`ò›O"İÈœD(Æ(Ûş<Ä<v%9Ö5H€ LÙÎÊ®ˆ>Ô«ÿÙ
+SÕŞœâŒÿJF©Ã¯Å2²°éB0iŞe¥‹:ğL·pQÊşªûàµLì½´×“qãü?É' $ß¹ãÌ‘*Ù²ü¹CGV@P6/–à“Nˆ°å­³£m
+boot=echo GORGY_BOOT: check update variables; run printoss; if test ${boot_status} -eq 1; then echo GORGY_BOOT: Phase 1; run boot_kernel; else echo GORGY_BOOT: Phase 2; setenv update_failed 1; saveenv; if test ${update_started} -eq 0; then echo GORGY_BOOT: Simple restart; run boot_kernel; else echo GORGY_BOOT: FAILED update; setenv update_started 0; run switch_os; run boot_kernel; fi; fi;
+boot_a_script=load ${devtype} ${devnum}:${distro_bootpart} ${scriptaddr} ${prefix}${script}; source ${scriptaddr}
+boot_device=MMC2
+boot_efi_binary=if fdt addr ${fdt_addr_r}; then bootefi bootmgr ${fdt_addr_r};else bootefi bootmgr ${fdtcontroladdr};fi;load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} efi/boot/bootarm.efi; if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r};else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi
+boot_emmc=setenv devtype mmc; setenv mmcdev 1; ${devtype} dev ${mmcdev}; if test $? -eq 0; then echo BOOT: EMMC; if ${devtype} rescan; then gpio set 54;setenv bootpart ${mmcdev}:${boot_part_targeted}; if test -e ${devtype} ${bootpart} /etc/fstab; then setenv mmcpart ${boot_part_targeted};echo [direct boot] mmcpart ${boot_part_targeted}; setenv mmcpart ${boot_part_targeted};setenv bootpart ${mmcdev}:${mmcpart};gpio set 55;if test -n ${dtb}; then echo debug: [dtb=${dtb}] ... ;setenv fdtfile ${dtb};echo Using: dtb=${fdtfile} ...;fi;gpio set 56; setenv oldroot /dev/mmcblk${mmcdev}p${mmcpart};echo Running bootz_runner ...;run bootz_runner;fi; fi; fi;
+boot_extlinux=sysboot ${devtype} ${devnum}:${distro_bootpart} any ${scriptaddr} ${prefix}extlinux/extlinux.conf
+boot_fdt=try
+boot_fit=0
+boot_kernel=saveenv; setenv boot_status 0; saveenv; run printoss; run boot_sd; echo Boot SD failed; echo Try EMMC ; run boot_emmc; echo Try other ; static_ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}::off
+boot_net_usb_start=usb start
+boot_part_targeted=3
+boot_prefixes=/ /boot/
+boot_script_dhcp=boot.scr.uimg
+boot_scripts=boot.scr.uimg boot.scr
+boot_sd=setenv devtype mmc; setenv mmcdev 0; ${devtype} dev ${mmcdev}; if test $? -eq 0; then echo BOOT: SD CARD; if ${devtype} rescan; then gpio set 54;echo Run boot process ...;for i in 3 2 1 ; do echo [try to boot] mmcpart ${i}; setenv mmcpart ${i};setenv bootpart ${mmcdev}:${mmcpart};gpio set 55;if test -n ${dtb}; then echo debug: [dtb=${dtb}] ... ;setenv fdtfile ${dtb};echo Using: dtb=${fdtfile} ...;fi;gpio set 56; if test -e ${devtype} ${bootpart} /etc/fstab; then setenv oldroot /dev/mmcblk${mmcdev}p${mmcpart};echo Running bootz_runner ...;run bootz_runner;fi;done;fi;fi;
+boot_targets=mmc0 legacy_mmc0 mmc1 legacy_mmc1 nand0 pxe dhcp 
+boot_ums=if test ${boot_device} = USBETH; then ums 0 mmc 1;fi;
+bootargs=console=ttyO0,115200n8 root=PARTUUID=142baa0d-03 ro rootfstype=ext4 rootwait
+bootcmd=if test ${boot_fit} -eq 1; then run update_to_fit; fi; run boot_ums; run findfdt; run init_console; run envboot; run distro_bootcmd
+bootcmd_dhcp=run boot_net_usb_start; if dhcp ${scriptaddr} ${boot_script_dhcp}; then source ${scriptaddr}; fi;setenv efi_fdtfile ${fdtfile}; if test -z "${fdtfile}" -a -n "${soc}"; then setenv efi_fdtfile ${soc}-${board}${boardver}.dtb; fi; setenv efi_old_vci ${bootp_vci};setenv efi_old_arch ${bootp_arch};setenv bootp_vci PXEClient:Arch:00010:UNDI:003000;setenv bootp_arch 0xa;if dhcp ${kernel_addr_r}; then tftpboot ${fdt_addr_r} dtb/${efi_fdtfile};if fdt addr ${fdt_addr_r}; then bootefi ${kernel_addr_r} ${fdt_addr_r}; else bootefi ${kernel_addr_r} ${fdtcontroladdr};fi;fi;setenv bootp_vci ${efi_old_vci};setenv bootp_arch ${efi_old_arch};setenv efi_fdtfile;setenv efi_old_arch;setenv efi_old_vci;
+bootcmd_legacy_mmc0=gpio clear 56; gpio clear 55; gpio clear 54; gpio set 53; setenv devtype mmc; setenv mmcdev 0; setenv bootpart 0:1 ; run boot
+bootcmd_legacy_mmc1=gpio clear 56; gpio clear 55; gpio clear 54; gpio set 53; setenv devtype mmc; setenv mmcdev 1; setenv bootpart 1:1 ; run boot
+bootcmd_mmc0=setenv devnum 0; run mmc_boot
+bootcmd_mmc1=setenv devnum 1; run mmc_boot
+bootcmd_nand=run nandboot
+bootcmd_pxe=run boot_net_usb_start; dhcp; if pxe get; then pxe boot; fi
+bootcount=1
+bootdelay=2
+bootdir=/boot
+bootenv=uEnv.txt
+bootenvfile=uEnv.txt
+bootfile=zImage
+bootm_size=0x10000000
+bootpart=1:3
+bootrecovery=echo GORGY_BOOT: boot in part_rescue;setenv boot_part_targeted ${part_rescue};saveenv; 
+bootscript=echo Running bootscript from mmc${bootpart} ...; source ${loadaddr}
+bootz_runner=setenv fdtpart ${bootpart}; run loadimage; echo debug: search devtype: ${devtype} id:part: ${fdtpart} fdtdir: ${fdtdir} fdtfile: ${fdtfile} ...; if test -e ${devtype} ${fdtpart} ${fdtdir}/${fdtfile}; then run loadfdt_custom;run args_mmc;echo debug: [${bootargs}] ... ;echo debug: [bootz ${loadaddr} - ${fdtaddr}] ... ;saveenv;bootz ${loadaddr} - ${fdtaddr}; else setenv fatal_error_msg loadfdt file not found: ${fdtpart} ${fdtdir}/${fdtfile}; run fatal_error;fi;
+console=ttyO0,115200n8
+cpu=armv7
+devnum=0
+devtype=mmc
+dfu_alt_info_emmc=rawemmc raw 0 3751936;boot part 1 1;rootfs part 1 2;MLO fat 1 1;MLO.raw raw 0x100 0x100;u-boot.img.raw raw 0x300 0x1000;u-env.raw raw 0x1300 0x200;spl-os-args.raw raw 0x1500 0x200;spl-os-image.raw raw 0x1700 0x6900;spl-os-args fat 1 1;spl-os-image fat 1 1;u-boot.img fat 1 1;uEnv.txt fat 1 1
+dfu_alt_info_mmc=boot part 0 1;rootfs part 0 2;MLO fat 0 1;MLO.raw raw 0x100 0x100;u-boot.img.raw raw 0x300 0x1000;u-env.raw raw 0x1300 0x200;spl-os-args.raw raw 0x1500 0x200;spl-os-image.raw raw 0x1700 0x6900;spl-os-args fat 0 1;spl-os-image fat 0 1;u-boot.img fat 0 1;uEnv.txt fat 0 1
+dfu_alt_info_nand=SPL part 0 1;SPL.backup1 part 0 2;SPL.backup2 part 0 3;SPL.backup3 part 0 4;u-boot part 0 5;u-boot-spl-os part 0 6;kernel part 0 8;rootfs part 0 9
+dfu_alt_info_ram=kernel ram 0x80200000 0x4000000;fdt ram 0x80f80000 0x80000;ramdisk ram 0x81000000 0x4000000
+distro_bootcmd=for target in ${boot_targets}; do run bootcmd_${target}; done
+dtb=gorgy_carte_116.dtb
+efi_dtb_prefixes=/ /dtb/ /dtb/current/
+envboot=mmc dev ${mmcdev}; if mmc rescan; then echo SD/MMC found on device ${mmcdev};if run loadbootscript; then run bootscript;else if run loadbootenv; then echo Loaded env from ${bootenvfile};run importbootenv;fi;if test -n $uenvcmd; then echo Running uenvcmd ...;run uenvcmd;fi;fi;fi;
+eth1addr=0c:ae:7d:1e:9e:3d
+ethact=cpsw
+ethaddr=0c:ae:7d:1e:9e:3b
+failumsboot=echo; echo FAILSAFE: U-Boot UMS (USB Mass Storage) enabled, media now available over the usb slave port ...; ums 0 ${devtype} 1;
+fatal_error=echo; echo FATAL_ERROR: ${fatal_error_msg}
+fatal_error_msg=unknown message
+fdt_addr_r=0x88000000
+fdtaddr=0x88000000
+fdtdir=/boot/
+fdtfile=gorgy_carte_116.dtb
+fdtpart=1:3
+fileaddr=88000000
+filesize=d603
+findfdt=echo board_name=[$board_name] ...; if test $board_name = gorgy_carte_116; then setenv fdtfile gorgy_carte_116.dtb; fi; if test $fdtfile = undefined; then setenv board_name gorgy_carte_116; setenv fdtfile gorgy_carte_116.dtb; fi; 
+finduuid=part uuid ${devtype} ${bootpart} uuid
+fit_bootfile=fitImage
+fit_loadaddr=0x87000000
+if_netconsole=ping $serverip
+importbootenv=echo Importing environment from ${devtype} ...; env import -t ${loadaddr} ${filesize}
+init_console=if test $board_name = A335_ICE; then setenv console ttyO3,115200n8;elif test $board_name = A335BLGC; then setenv console ttyO4,115200n8;else setenv console ttyO0,115200n8;fi;
+ipaddr=192.168.1.2
+kernel_addr_r=0x82000000
+load_efi_dtb=load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${prefix}${efi_fdtfile}
+loadaddr=0x82000000
+loadbootenv=load ${devtype} ${bootpart} ${loadaddr} ${bootenvfile}
+loadbootscript=load ${devtype} ${bootpart} ${loadaddr} ${scriptfile};
+loadfdt=echo loading ${fdtdir}/${fdtfile} ...; load ${devtype} ${bootpart} ${fdtaddr} ${fdtdir}/${fdtfile}
+loadfdt_custom=echo GORGY_BOOT: loading ${fdtdir}/${fdtfile} ...; load ${devtype} ${fdtpart} ${fdtaddr} ${fdtdir}/${fdtfile}
+loadfit=run args_mmc; bootm ${loadaddr}#${fdtfile};
+loadimage=load ${devtype} ${bootpart} ${loadaddr} ${bootdir}/${bootfile}
+loadramdisk=load mmc ${mmcdev} ${rdaddr} ramdisk.gz
+loadrd=load ${devtype} ${bootpart} ${rdaddr} ${bootdir}/${rdfile}; setenv rdsize ${filesize}
+mmc_boot=if mmc dev ${devnum}; then setenv devtype mmc; run scan_dev_for_boot_part; fi
+mmcboot=mmc dev ${mmcdev}; setenv devnum ${mmcdev}; setenv devtype mmc; if mmc rescan; then echo SD/MMC found on device ${mmcdev};if run loadimage; then if test ${boot_fit} -eq 1; then run loadfit; else run mmcloados;fi;fi;fi;
+mmcdev=1
+mmcloados=run args_mmc; if test ${boot_fdt} = yes || test ${boot_fdt} = try; then if run loadfdt; then if test -n ${uname_r}; then bootz ${loadaddr} ${rdaddr}:${rdsize} ${fdtaddr}; else bootz ${loadaddr} - ${fdtaddr}; fi; else if test ${boot_fdt} = try; then bootz; else echo WARN: Cannot load the DT; fi; fi; else bootz; fi;
+mmcpart=3
+mmcrootfstype=ext4 rootwait
+nandargs=setenv bootargs console=${console} ${optargs} root=${nandroot} rootfstype=${nandrootfstype}
+nandboot=echo Booting from nand ...; run nandargs; nand read ${fdtaddr} NAND.u-boot-spl-os; nand read ${loadaddr} NAND.kernel; bootz ${loadaddr} - ${fdtaddr}
+nandroot=ubi0:rootfs rw ubi.mtd=NAND.file-system,2048
+nandrootfstype=ubifs rootwait=1
+netargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=dhcp
+netboot=echo Booting from network ...; setenv autoload no; dhcp; run netloadimage; run netloadfdt; run netargs; bootz ${loadaddr} - ${fdtaddr}
+netloadfdt=tftp ${fdtaddr} ${fdtfile}
+netloadimage=tftp ${loadaddr} ${bootfile}
+nfsopts=nolock
+oldroot=/dev/mmcblk1p3
+part_config=5
+part_logs=7
+part_os_a=2
+part_os_b=3
+part_params=6
+part_rescue=1
+partitions=uuid_disk=${uuid_gpt_disk};name=rootfs,start=2MiB,size=-,uuid=${uuid_gpt_rootfs}
+preboot=run if_netconsole start_netconsole
+printoss=echo GORGY_BOOT: S(${boot_status}) P(${boot_part_targeted}) U(${update_started}) F(${update_failed})
+pxefile_addr_r=0x80100000
+ramargs=setenv bootargs console=${console} ${optargs} root=${ramroot} rootfstype=${ramrootfstype}
+ramboot=echo Booting from ramdisk ...; run ramargs; bootz ${loadaddr} ${rdaddr} ${fdtaddr}
+ramdisk_addr_r=0x88080000
+ramroot=/dev/ram0 rw
+ramrootfstype=ext2
+rdaddr=0x88080000
+rootpath=/export/rootfs
+scan_dev_for_boot=echo Scanning ${devtype} ${devnum}:${distro_bootpart}...; for prefix in ${boot_prefixes}; do run scan_dev_for_extlinux; run scan_dev_for_scripts; done;run scan_dev_for_efi;
+scan_dev_for_boot_part=part list ${devtype} ${devnum} -bootable devplist; env exists devplist || setenv devplist 1; for distro_bootpart in ${devplist}; do if fstype ${devtype} ${devnum}:${distro_bootpart} bootfstype; then run scan_dev_for_boot; fi; done
+scan_dev_for_efi=setenv efi_fdtfile ${fdtfile}; if test -z "${fdtfile}" -a -n "${soc}"; then setenv efi_fdtfile ${soc}-${board}${boardver}.dtb; fi; for prefix in ${efi_dtb_prefixes}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${efi_fdtfile}; then run load_efi_dtb; fi;done;if test -e ${devtype} ${devnum}:${distro_bootpart} efi/boot/bootarm.efi; then echo Found EFI removable media binary efi/boot/bootarm.efi; run boot_efi_binary; echo EFI LOAD FAILED: continuing...; fi; setenv efi_fdtfile
+scan_dev_for_extlinux=if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}extlinux/extlinux.conf; then echo Found ${prefix}extlinux/extlinux.conf; run boot_extlinux; echo SCRIPT FAILED: continuing...; fi
+scan_dev_for_scripts=for script in ${boot_scripts}; do if test -e ${devtype} ${devnum}:${distro_bootpart} ${prefix}${script}; then echo Found U-Boot script ${prefix}${script}; run boot_a_script; echo SCRIPT FAILED: continuing...; fi; done
+script=boot.scr
+scriptaddr=0x80000000
+scriptfile=${script}
+serial#=%	|ìã‹7Xg•> AÍaÚ%iÄ$ã‹÷J€B»Ä‘. C¨ƒŞ9ñ€sé”¾³¡@e.èa¾rÜiTHp!Êhäº.#à6…š¡w©ĞÇEŸ^Reáï÷~‹ ‹<ÌW(]LŞÓ».àöŞ$™Ç`ò›O"İˆDªÆ(ûş<Ä<v%9×4H€ LÙ!ÎÊ®ˆ>Ü«ûÙ
+RÕÎœêŒÿJF©ÁïÁ2²°¨B0iÚm¥‹:¤àM·pQ8ˆşªù`µLì­„×‘Áqã|=¨%`$×¹ãÈ‘jÉ²ü¹CGÖ@Q6-–à“Îˆ°å­»«m
+serverip=192.168.1.1
+soc=am33xx
+spiargs=setenv bootargs console=${console} ${optargs} root=${spiroot} rootfstype=${spirootfstype}
+spiboot=echo Booting from spi ...; run spiargs; sf probe ${spibusno}:0; sf read ${loadaddr} ${spisrcaddr} ${spiimgsize}; bootz ${loadaddr}
+spibusno=0
+spiimgsize=0x362000
+spiroot=/dev/mtdblock4 rw
+spirootfstype=jffs2
+spisrcaddr=0xe0000
+start_netconsole=setenv ncip $serverip; setenv bootdelay 10; setenv stdin serial,nc; setenv stdout serial,nc; setenv stderr serial,nc; version
+switch_os=if test ${boot_part_targeted} -eq ${part_os_a}; then setenv boot_part_targeted ${part_os_b};elif test ${boot_part_targeted} -eq ${part_os_b}; then setenv boot_part_targeted ${part_os_a};fi;
+update_to_fit=setenv loadaddr ${fit_loadaddr}; setenv bootfile ${fit_bootfile}
+usb_boot=usb start; if usb dev ${devnum}; then setenv devtype usb; run scan_dev_for_boot_part; fi
+usbnet_devaddr=0c:ae:7d:1e:9e:3b
+uuid=142baa0d-03
+vendor=gorgy
+ver=U-Boot 2018.07 (Nov 23 2018 - 17:36:19 +0000)
+version_os_a=unknown
+version_os_b=20181217
+boot_status=1
+update_started=0
+update_failed=0

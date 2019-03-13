@@ -1,0 +1,9 @@
+[package]
+name = "fw_env"
+version = "0.1.0"
+authors = ["Xavier Bestel <xavier.bestel@free.fr>"]
+edition = "2018"
+
+[dependencies]
+scan_fmt = "0.1"
+crc = "1"
