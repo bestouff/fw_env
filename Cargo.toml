@@ -2,6 +2,9 @@
 name = "fw_env"
 version = "0.1.0"
 authors = ["Xavier Bestel <xavier.bestel@free.fr>"]
+description = "fw_printenv from U-Boot tools in pure Rust"
+license = "MIT"
+repository = "https://github.com/bestouff/fw_env"
 edition = "2018"
 
 [dependencies]
