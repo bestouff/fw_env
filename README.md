@@ -7,7 +7,7 @@ Basic usage:
 ```rust
 	let config = Config::init()?;
 	let env = FwEnv::read(&config)?;
-	let uboot_version = env.find_var(b"ver"[..]).expect("variable not found");
+	let uboot_version = env.find_var(&b"ver"[..]).expect("variable not found");
 ```
 
 ## TODO
