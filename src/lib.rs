@@ -10,6 +10,7 @@ pub enum FwError {
     WrongDevNum(usize),
     BadCrc,
     EnvVarSyntax(String),
+    Scan(scan_fmt::parse::ScanError)
 }
 
 impl std::fmt::Display for FwError {
@@ -18,6 +19,12 @@ impl std::fmt::Display for FwError {
             FwError::Io(err) => err.fmt(f),
             _ => write!(f, "Parsing trouble"),
         }
+    }
+}
+
+impl From<scan_fmt::parse::ScanError> for FwError {
+    fn from(err: scan_fmt::parse::ScanError) -> FwError {
+        FwError::Scan(err)
     }
 }
 
@@ -53,11 +60,8 @@ impl std::str::FromStr for ConfigLine {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (devname, start, size) =
-            scan_fmt::scan_fmt!(s, "{} 0x{x} 0x{x}", String, String, String);
-        let devname = devname.ok_or(FwError::ParseDevname)?;
-        let start = start.ok_or(FwError::ParseStart)?;
+            scan_fmt::scan_fmt!(s, "{} 0x{x} 0x{x}", String, String, String)?;
         let start = usize::from_str_radix(&start, 16)?;
-        let size = size.ok_or(FwError::ParseSize)?;
         let size = usize::from_str_radix(&size, 16)?;
         Ok(Self {
             devname,
@@ -132,8 +136,11 @@ impl FwEnv {
         } else {
             ENV_SIMPLE_SIZE
         };
-        let crc = crc::crc32::checksum_ieee(&block[skipped_bytes..]);
-        if crc != refcrc {
+        let crc = crc::Crc::<u32>::new(&crc::CRC_32_ISO_HDLC);
+        let mut digest = crc.digest();
+        digest.update(&block[skipped_bytes..]);
+        let result = digest.finalize();
+        if result != refcrc {
             return Err(FwError::BadCrc);
         }
         let mut vars = Vec::new();
